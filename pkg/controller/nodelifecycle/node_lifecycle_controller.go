@@ -691,6 +691,8 @@ func (nc *Controller) monitorNodeHealth(ctx context.Context) error {
 	zoneToNodeConditions := map[string][]*v1.NodeCondition{}
 	updateNodeFunc := func(piece int) {
 		start := nc.now()
+		node := nodes[piece].DeepCopy()
+		klog.Infof("Start Check Node Condition... Node Index : %s , time : %v", node.Name, start)
 		defer func() {
 			updateNodeHealthDuration.Observe(time.Since(start.Time).Seconds())
 		}()
@@ -742,6 +744,8 @@ func (nc *Controller) monitorNodeHealth(ctx context.Context) error {
 			switch {
 			case currentReadyCondition.Status != v1.ConditionTrue && observedReadyCondition.Status == v1.ConditionTrue:
 				// Report node event only once when status changed.
+				notReadyTime := time.Now()
+				klog.Infof("Node %s Notready!!! : %v, duration : %v",node.Name, notReadyTime, notReadyTime.Sub(start.Time))
 				controllerutil.RecordNodeStatusChange(nc.recorder, node, "NodeNotReady")
 				fallthrough
 			case needsRetry && observedReadyCondition.Status != v1.ConditionTrue:
