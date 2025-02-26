@@ -744,7 +744,7 @@ func (nc *Controller) monitorNodeHealth(ctx context.Context) error {
 			switch {
 			case currentReadyCondition.Status != v1.ConditionTrue && observedReadyCondition.Status == v1.ConditionTrue:
 				// Report node event only once when status changed.
-				notReadyTime := time.Now()
+				notReadyTime = time.Now()
 				klog.Infof("Node %s Notready!!! : %v, duration : %v",node.Name, notReadyTime, notReadyTime.Sub(start.Time))
 				controllerutil.RecordNodeStatusChange(nc.recorder, node, "NodeNotReady")
 				fallthrough
